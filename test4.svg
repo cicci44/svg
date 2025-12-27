@@ -1,0 +1,141 @@
+<svg id="damperWidget"
+  width="200" height="400" 
+  viewBox="0 0 600 400" 
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <!-- Övre spjäll -->
+  <g id="upper" transform="translate(100, 140)">
+    <g id="upperLine" transform="rotate(0)">
+      <line x1="-70" y1="0" x2="70" y2="0" stroke="currentColor" stroke-width="20" stroke-linecap="round"/>
+    </g>
+    <circle cx="0" cy="0" r="30" fill="currentColor"/>
+  </g>
+  
+  <!-- Nedre spjäll -->
+  <g id="lower" transform="translate(100, 260)">
+    <g id="lowerLine" transform="rotate(0)">
+      <line x1="-70" y1="0" x2="70" y2="0" stroke="currentColor" stroke-width="20" stroke-linecap="round"/>
+    </g>
+    <circle cx="0" cy="0" r="30" fill="currentColor"/>
+  </g>
+  
+  <!-- Ram -->
+  <rect x="10" y="10" width="180" height="380" rx="12" fill="none" stroke="currentColor" stroke-width="12"/>
+  
+  <script>
+    <![CDATA[
+    //!export-start
+    let _pn_upperAngle = 0;
+    let _pn_lowerAngle = 0;
+    let _pb_animate = false;
+    let _pn_animationSpeed = 6;
+    //!export-end
+    
+    let animationInterval = null;
+    let currentUpperAngle = 0;
+    let currentLowerAngle = 0;
+    
+    function putValue(id, value) {
+      if (id === '_pn_upperAngle') {
+        _pn_upperAngle = Math.max(0, Math.min(90, value));
+        if (!_pb_animate) {
+          updateDamper('upper', _pn_upperAngle);
+        }
+      }
+      if (id === '_pn_lowerAngle') {
+        _pn_lowerAngle = Math.max(0, Math.min(90, value));
+        if (!_pb_animate) {
+          updateDamper('lower', _pn_lowerAngle);
+        }
+      }
+      if (id === '_pb_animate') {
+        _pb_animate = value;
+        if (value) {
+          startAnimation();
+        } else {
+          stopAnimation();
+          updateDamper('upper', _pn_upperAngle);
+          updateDamper('lower', _pn_lowerAngle);
+        }
+      }
+      if (id === '_pn_animationSpeed') {
+        _pn_animationSpeed = value;
+        if (_pb_animate) {
+          stopAnimation();
+          startAnimation();
+        }
+      }
+    }
+    
+    function postValue(id, value) {
+      console.error('Not defined!');
+    }
+    
+    function updateDamper(damper, angle) {
+      const line = document.getElementById(damper + 'Line');
+      if (line) {
+        line.setAttribute('transform', `rotate(${angle})`);
+      }
+    }
+    
+    function startAnimation() {
+      if (animationInterval) return;
+      
+      let time = 0;
+      const duration = _pn_animationSpeed * 1000;
+      
+      animationInterval = setInterval(() => {
+        const checkDestroy = document.getElementById('damperWidget');
+        if (!checkDestroy) {
+          stopAnimation();
+          return;
+        }
+        
+        time += 50;
+        const progress = (time % duration) / duration;
+        
+        // Ease-in-out funktion för mjuk animation
+        const easeInOut = progress < 0.5 
+          ? 2 * progress * progress 
+          : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+        
+        // Oscillera mellan 0 och 90 grader
+        const angle = progress < 0.5 
+          ? easeInOut * 90 
+          : 90 - (easeInOut - 0.5) * 2 * 90;
+        
+        currentUpperAngle = angle;
+        currentLowerAngle = angle;
+        
+        updateDamper('upper', angle);
+        updateDamper('lower', angle);
+      }, 50);
+    }
+    
+    function stopAnimation() {
+      if (animationInterval) {
+        clearInterval(animationInterval);
+        animationInterval = null;
+      }
+    }
+    
+    // MutationObserver för cleanup
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.removedNodes.forEach((node) => {
+          if (node.id === 'damperWidget') {
+            stopAnimation();
+            observer.disconnect();
+          }
+        });
+      });
+    });
+    
+    observer.observe(document.body, { childList: true, subtree: true });
+    
+    // Initial uppdatering
+    updateDamper('upper', _pn_upperAngle);
+    updateDamper('lower', _pn_lowerAngle);
+    ]]>
+  </script>
+</svg>
