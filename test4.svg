@@ -1,22 +1,22 @@
 <svg id="damperWidget"
   width="200" height="400" 
-  viewBox="0 0 200 400" 
+  viewBox="0 0 600 400" 
   xmlns="http://www.w3.org/2000/svg"
 >
   <!-- Övre spjäll -->
-  <g id="upper" transform="translate(100, 140)">
+  <g id="upper" transform="translate(100, 120)">
     <g id="upperLine" transform="rotate(0)">
-      <line x1="-70" y1="0" x2="70" y2="0" stroke="currentColor" stroke-width="20" stroke-linecap="round"/>
+      <line x1="-60" y1="0" x2="60" y2="0" stroke="currentColor" stroke-width="16" stroke-linecap="round"/>
     </g>
-    <circle cx="0" cy="0" r="30" fill="currentColor"/>
+    <circle cx="0" cy="0" r="25" fill="currentColor"/>
   </g>
   
   <!-- Nedre spjäll -->
-  <g id="lower" transform="translate(100, 260)">
+  <g id="lower" transform="translate(100, 280)">
     <g id="lowerLine" transform="rotate(0)">
-      <line x1="-70" y1="0" x2="70" y2="0" stroke="currentColor" stroke-width="20" stroke-linecap="round"/>
+      <line x1="-60" y1="0" x2="60" y2="0" stroke="currentColor" stroke-width="16" stroke-linecap="round"/>
     </g>
-    <circle cx="0" cy="0" r="30" fill="currentColor"/>
+    <circle cx="0" cy="0" r="25" fill="currentColor"/>
   </g>
   
   <!-- Ram -->
@@ -26,8 +26,8 @@
     <![CDATA[
     //!export-start
     let _pn_ovre = 0;
-    let _pn_nedre = 100;
-    let _pb_animering_start = false;
+    let _pn_nedre = 0;
+    let _pb_animera = false;
     let _pn_hastighet = 6;
     //!export-end
     
@@ -38,18 +38,18 @@
     function putValue(id, value) {
       if (id === '_pn_ovre') {
         _pn_ovre = Math.max(0, Math.min(90, value));
-        if (!_pb_animering_start) {
+        if (!_pb_animera) {
           updateDamper('upper', _pn_ovre);
         }
       }
       if (id === '_pn_nedre') {
         _pn_nedre = Math.max(0, Math.min(90, value));
-        if (!_pb_animering_start) {
+        if (!_pb_animera) {
           updateDamper('lower', _pn_nedre);
         }
       }
-      if (id === '_pb_animering_start') {
-        _pb_animering_start = value;
+      if (id === '_pb_animera') {
+        _pb_animera = value;
         if (value) {
           startAnimation();
         } else {
@@ -60,7 +60,7 @@
       }
       if (id === '_pn_hastighet') {
         _pn_hastighet = value;
-        if (_pb_animering_start) {
+        if (_pb_animera) {
           stopAnimation();
           startAnimation();
         }
