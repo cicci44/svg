@@ -1,6 +1,6 @@
 <svg id="damperWidget"
   width="200" height="400" 
-  viewBox="0 0 600 400" 
+  viewBox="0 0 200 400" 
   xmlns="http://www.w3.org/2000/svg"
 >
   <!-- Övre spjäll -->
@@ -25,10 +25,10 @@
   <script>
     <![CDATA[
     //!export-start
-    let _pn_upperAngle = 0;
-    let _pn_lowerAngle = 0;
-    let _pb_animate = false;
-    let _pn_animationSpeed = 6;
+    let _pn_ovre = 0;
+    let _pn_nedre = 100;
+    let _pb_animering_start = false;
+    let _pn_hastighet = 6;
     //!export-end
     
     let animationInterval = null;
@@ -36,31 +36,31 @@
     let currentLowerAngle = 0;
     
     function putValue(id, value) {
-      if (id === '_pn_upperAngle') {
-        _pn_upperAngle = Math.max(0, Math.min(90, value));
-        if (!_pb_animate) {
-          updateDamper('upper', _pn_upperAngle);
+      if (id === '_pn_ovre') {
+        _pn_ovre = Math.max(0, Math.min(90, value));
+        if (!_pb_animering_start) {
+          updateDamper('upper', _pn_ovre);
         }
       }
-      if (id === '_pn_lowerAngle') {
-        _pn_lowerAngle = Math.max(0, Math.min(90, value));
-        if (!_pb_animate) {
-          updateDamper('lower', _pn_lowerAngle);
+      if (id === '_pn_nedre') {
+        _pn_nedre = Math.max(0, Math.min(90, value));
+        if (!_pb_animering_start) {
+          updateDamper('lower', _pn_nedre);
         }
       }
-      if (id === '_pb_animate') {
-        _pb_animate = value;
+      if (id === '_pb_animering_start') {
+        _pb_animering_start = value;
         if (value) {
           startAnimation();
         } else {
           stopAnimation();
-          updateDamper('upper', _pn_upperAngle);
-          updateDamper('lower', _pn_lowerAngle);
+          updateDamper('upper', _pn_ovre);
+          updateDamper('lower', _pn_nedre);
         }
       }
-      if (id === '_pn_animationSpeed') {
-        _pn_animationSpeed = value;
-        if (_pb_animate) {
+      if (id === '_pn_hastighet') {
+        _pn_hastighet = value;
+        if (_pb_animering_start) {
           stopAnimation();
           startAnimation();
         }
@@ -82,7 +82,7 @@
       if (animationInterval) return;
       
       let time = 0;
-      const duration = _pn_animationSpeed * 1000;
+      const duration = _pn_hastighet * 1000;
       
       animationInterval = setInterval(() => {
         const checkDestroy = document.getElementById('damperWidget');
@@ -134,8 +134,8 @@
     observer.observe(document.body, { childList: true, subtree: true });
     
     // Initial uppdatering
-    updateDamper('upper', _pn_upperAngle);
-    updateDamper('lower', _pn_lowerAngle);
+    updateDamper('upper', _pn_ovre);
+    updateDamper('lower', _pn_nedre);
     ]]>
   </script>
 </svg>
